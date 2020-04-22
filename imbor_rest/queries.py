@@ -1,13 +1,15 @@
 class OtlQueries:
-
     def __init__(self):
         self.prefix_groep = "<http://linkeddata.crow.nl/publication-v2/ns/crow/imbor/version/1243521994744365056/def/groepering/>"
         self.prefix_nta8035 = "<https://w3id.org/def/basicsemantics-owl#>"
 
     def selecteer_vakdisciplines(self):
-        return """ 
+        return (
+            """ 
      PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        PREFIX groep: """ + self.prefix_groep + """
+        PREFIX groep: """
+            + self.prefix_groep
+            + """
     
         SELECT ?VakdisciplineURI ?VakdisciplineLabel
           WHERE {
@@ -15,15 +17,19 @@ class OtlQueries:
             ?VakdisciplineURI skos:prefLabel ?VakdisciplineLabel .
           }
     """
+        )
 
     def selecteer_objecttypen_per_vakdiscipline(self, vakdiscipline):
-        return """
+        return (
+            """
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
         
         SELECT ?VakdisciplineURI ?VakdisciplineLabel ?FysiekObjectURI ?FysiekObjectLabel
         WHERE {
         # Selecteer de klasse Wegen binnen de groeperingen ...
-            BIND (\"""" + vakdiscipline + """\"@nl-NL as ?VakdisciplineLabel)
+            BIND (\""""
+            + vakdiscipline
+            + """\"@nl-NL as ?VakdisciplineLabel)
             ?VakdisciplineURI a skos:Collection;
             skos:prefLabel ?VakdisciplineLabel;
          # ... en laat de members van die groep zien.                          
@@ -32,11 +38,15 @@ class OtlQueries:
         }
         ORDER BY ?FysiekObjectLabel
     """
+        )
 
     def selecteer_collecties(self):
-        return """
+        return (
+            """
         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                PREFIX groep:  """ + self.prefix_groep + """
+                PREFIX groep:  """
+            + self.prefix_groep
+            + """
     
               SELECT (?memberLabel as ?collecties)
               WHERE {
@@ -44,11 +54,15 @@ class OtlQueries:
                   ?member skos:prefLabel ?memberLabel .
               } order by ?member
     """
+        )
 
     def selecteer_objecttypegroepen(self):
-        return """
+        return (
+            """
             PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-            PREFIX groep:  """ + self.prefix_groep + """
+            PREFIX groep:  """
+            + self.prefix_groep
+            + """
             
             SELECT ?objecttypegroepURI ?objecttypegroepLabel
             WHERE {
@@ -56,11 +70,15 @@ class OtlQueries:
                 ?objecttypegroepURI skos:prefLabel ?objecttypegroepLabel .
             }
         """
+        )
 
     def selecteer_beheerobjecten(self):
-        return """
+        return (
+            """
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                PREFIX nta8035: """ + self.prefix_nta8035 + """
+                PREFIX nta8035: """
+            + self.prefix_nta8035
+            + """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 
                 SELECT (?thing AS ?FysiekObjectURI) ?FysiekObjectLabel ?FysiekObjectDefinitie 
@@ -76,11 +94,15 @@ class OtlQueries:
                 }
                 ORDER BY ?FysiekObjectLabel
            """
+        )
 
     def selecteer_eigenschappen_per_beheerobject(self, beheerobject):
-        return """
+        return (
+            """
                 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                PREFIX nta8035: """ + self.prefix_nta8035 + """
+                PREFIX nta8035: """
+            + self.prefix_nta8035
+            + """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX sh: <http://www.w3.org/ns/shacl#>
                 
@@ -94,7 +116,9 @@ class OtlQueries:
                 # ... alleen binnen IMBOR objecten.
                             FILTER regex(str(?FysiekObjectURI), "crow/imbor")
                             
-                            FILTER (LCASE(str(?preflabel)) = \"""" + beheerobject.lower() + """\") # heel woord
+                            FILTER (LCASE(str(?preflabel)) = \""""
+            + beheerobject.lower()
+            + """\") # heel woord
                             BIND (?preflabel AS ?FysiekObjectLabel)
                             
                 # Trek het property-path uit elkaar, maak de SHACL shapes optioneel, deze zijn niet altijd aanwezig
@@ -116,4 +140,5 @@ class OtlQueries:
                 }
                 
                 ORDER BY str(?FysiekObjectLabel) str(?EigenschapLabel) str(?EigenschapVanObjectLabel)
-           """
+           """        )
+
