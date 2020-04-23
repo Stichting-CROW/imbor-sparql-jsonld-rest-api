@@ -24,6 +24,41 @@ crow_ldp = CrowLdp(
 
 otl_queries = OtlQueries()
 
+
+class CONTEXTS:
+    Beheerobject = {
+        "@language": "nl-nl",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "prefLabel": "http://www.w3.org/2004/02/skos/core#prefLabel",
+        "subClassOf": {
+            "@id": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+            "@type": "@id",
+        },
+        "guid": {
+            "@id": "http://www.w3.org/2004/02/skos/core#notation",
+            "@type": "@id",
+        },
+        "definition": "http://www.w3.org/2004/02/skos/core#definition",
+    }
+
+
+def swagger_property_schema_for_jsonld_context(context):
+    schema = dict()
+
+    for k, v in context.items():
+        if isinstance(v, dict):
+            if v["@type"] == "@id":
+                schema[k] = {"type": "string", "format": "uri"}
+                continue
+
+        if "@" in k:
+            continue
+
+        schema[k] = {"type": "string"}
+
+    return schema
+
+
 swagger = Swagger(
     app,
     template={
@@ -54,11 +89,9 @@ swagger = Swagger(
                     }
                 },
                 "beheerobjecten": {
-                    "properties": {
-                        "FysiekObjectURI": {"type": "string", "format": "uri"},
-                        "FysiekObjectLabel": {"type": "string"},
-                        "FysiekObjectDefinitie": {"type": "string"},
-                    }
+                    "properties": swagger_property_schema_for_jsonld_context(
+                        CONTEXTS.Beheerobject
+                    )
                 },
                 "beheerobject_eigenschappen": {
                     "properties": {
@@ -204,25 +237,10 @@ def get_beheerobjecten():
 
     # limit en paging
 
-    context = {
-        "@language": "nl-nl",
-        "label": "http://www.w3.org/2000/01/rdf-schema#label",
-        "prefLabel": "http://www.w3.org/2004/02/skos/core#prefLabel",
-        "subClassOf": {
-            "@id": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
-            "@type": "@id",
-        },
-        "guid": {
-            "@id": "http://www.w3.org/2004/02/skos/core#notation",
-            "@type": "@id",
-        },
-        "definition": "http://www.w3.org/2004/02/skos/core#definition",
-    }
-
     response = list()
 
     for beheerobject in res:
-        response.append(jsonld.compact(beheerobject, context))
+        response.append(jsonld.compact(beheerobject, CONTEXTS.Beheerobject))
 
     # print(type(res))
 
