@@ -4,6 +4,8 @@ from flask_talisman import Talisman
 from .crow_ldp_caller import CrowLdp
 from .queries import OtlQueries
 from flask_cors import CORS
+from pyld import jsonld
+import json
 
 app = Flask(__name__)
 # let op, hier verwijzen naar de juiste config file met api keys
@@ -200,7 +202,35 @@ def get_beheerobjecten():
 
     res = crow_ldp.run_query(otl_queries.selecteer_beheerobjecten())
 
-    return res, 200
+    # limit en paging
+
+    context = {
+        "@language": "nl-nl",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "prefLabel": "http://www.w3.org/2004/02/skos/core#prefLabel",
+        "subClassOf": {
+            "@id": "http://www.w3.org/2000/01/rdf-schema#subClassOf",
+            "@type": "@id",
+        },
+        "guid": {
+            "@id": "http://www.w3.org/2004/02/skos/core#notation",
+            "@type": "@id",
+        },
+        "definition": "http://www.w3.org/2004/02/skos/core#definition",
+    }
+
+    response = list()
+
+    for beheerobject in res:
+        response.append(jsonld.compact(beheerobject, context))
+
+    # print(type(res))
+
+    return (
+        json.dumps(response, ensure_ascii=False),
+        200,
+        {"Content-Type": "application/ld+json"},
+    )
 
 
 @app.route("/beheerobjecten/<string:beheerobject>/")
@@ -233,4 +263,3 @@ def get_eigenschappen_per_beheerobject(beheerobject):
     )
 
     return res, 200
-

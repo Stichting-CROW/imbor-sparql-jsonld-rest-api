@@ -81,18 +81,7 @@ class OtlQueries:
             + """
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 
-                SELECT (?thing AS ?FysiekObjectURI) ?FysiekObjectLabel ?FysiekObjectDefinitie 
-                WHERE {
-                # Selecteer alleen klassen ...
-                    ?thing a rdfs:Class ; 
-                # ... die een directe subklasse zijn van NTA8035 Fysiek object ...
-                           rdfs:subClassOf nta8035:PhysicalObject ; 
-                # ... en een preferred label hebben ...
-                           skos:prefLabel ?FysiekObjectLabel ; 
-                # ... en een definitie hebben.
-                           skos:definition ?FysiekObjectDefinitie .
-                }
-                ORDER BY ?FysiekObjectLabel
+                CONSTRUCT { ?s ?p ?o } WHERE { ?s rdfs:subClassOf nta8035:PhysicalObject ; ?p ?o . } 
            """
         )
 
@@ -140,5 +129,5 @@ class OtlQueries:
                 }
                 
                 ORDER BY str(?FysiekObjectLabel) str(?EigenschapLabel) str(?EigenschapVanObjectLabel)
-           """        )
-
+           """
+        )

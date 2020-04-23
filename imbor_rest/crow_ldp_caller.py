@@ -63,7 +63,7 @@ class CrowLdp:
     def run_query(self, payload):
         s = Session()
         url = self.base_url
-        querystring = {"output": "json", "toolid": self.toolId, "trace": "namespaces"}
+        querystring = {"toolid": self.toolId, "trace": "namespaces"}
         url = str(url) + "?" + urllib.parse.urlencode(querystring)
 
         req = Request("POST", url, data=payload)
@@ -71,7 +71,11 @@ class CrowLdp:
         req.headers = headers
         auth = self.get_hmac(req, url)
         # print(auth)
-        headers = {"Authorization": auth, "Content-Type": "application/sparql-query"}
+        headers = {
+            "Authorization": auth,
+            "Content-Type": "application/sparql-query",
+            "Accept": "application/ld+json, text/turtle, */*",
+        }
         req.headers = headers
         prepared = req.prepare()
         response = s.send(prepared)
