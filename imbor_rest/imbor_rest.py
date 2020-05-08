@@ -233,7 +233,7 @@ def get_beheerobjecten():
 
     """
 
-    res = crow_ldp.run_query(otl_queries.selecteer_beheerobjecten())
+    res = crow_ldp.construct(query=otl_queries.selecteer_beheerobjecten())
 
     # limit en paging
 
