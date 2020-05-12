@@ -1,0 +1,80 @@
+<head>
+    <link href="https://unpkg.com/@triply/yasgui/build/yasgui.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/@triply/yasgui/build/yasgui.min.js"></script>
+    <style>
+        .yasgui .autocompleteWrapper {
+            /* display: none !important ; */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            margin: 0;
+        }
+
+        header {
+            background-color: #009de0;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        header * {
+            margin: 0;
+            color: white;
+        }
+
+        main {
+            margin: 1rem ;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>CROW REST API</h1>
+        <p>Zoekvragen vereisen een toepasselijk abonnement op <a href='http://crow.nl'>CROW.nl</a>.</p>
+    </header>
+    <main>
+        <div id="yasgui"></div>
+    </main>
+    <script>
+        const yasgui = new Yasgui(document.getElementById("yasgui"), {
+            requestConfig: {
+                endpoint: "{{ base_url }}endpoint/sparql",
+                method: "POST",
+            },
+            copyEndpointOnNewTab: true,
+            endpointCatalogueOptions: {
+                getData: () => {
+                    return [
+                        //List of objects should contain the endpoint field
+                        //Feel free to include any other fields (e.g. a description or icon
+                        //that you'd like to use when rendering)
+                        {
+                            endpoint: "{{ base_url }}endpoint/sparql",
+                            method: "POST",
+                        },
+                        {
+                            endpoint: "https://dbpedia.org/sparql"
+                        },
+                        {
+                            endpoint: "https://query.wikidata.org"
+                        },
+                    ];
+                },
+                //Data object keys that are used for filtering. The 'endpoint' key already used by default
+                keys: [],
+                //Data argument contains a `value` property for the matched data object
+                //Source argument is the suggestion DOM element to append your rendered item to
+                renderItem: (data, source) => {
+                    const contentDiv = document.createElement("div");
+                    contentDiv.innerText = data.value.endpoint;
+                    source.appendChild(contentDiv);
+                }
+            }
+
+        });
+    </script>
+</body>
